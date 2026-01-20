@@ -1,0 +1,37 @@
+## Interface: 120000
+## Title: Daves Action Bar Customizer
+## Notes: Customize font and size of keybind and stack text on default action bars
+## Author: davethemage
+## Version: 1.0.0
+## IconTexture: Interface\AddOns\Daves Action Bar Customizer\images\icon
+## Category: Customization
+
+## SavedVariables: DABC_DB
+#SharedMedia Dependency
+libs\LibSharedMedia-3.0\LibStub\LibStub.lua
+libs\LibSharedMedia-3.0\CallbackHandler-1.0\CallbackHandler-1.0.lua
+libs\LibSharedMedia-3.0\LibSharedMedia-3.0\lib.xml
+
+#Ace3 Dependency
+libs\Ace3\LibStub\LibStub.lua
+libs\Ace3\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\Ace3\AceAddon-3.0\AceAddon-3.0.xml
+libs\Ace3\AceEvent-3.0\AceEvent-3.0.xml
+libs\Ace3\AceTimer-3.0\AceTimer-3.0.xml
+libs\Ace3\AceBucket-3.0\AceBucket-3.0.xml
+libs\Ace3\AceHook-3.0\AceHook-3.0.xml
+libs\Ace3\AceDB-3.0\AceDB-3.0.xml
+libs\Ace3\AceDBOptions-3.0\AceDBOptions-3.0.xml
+libs\Ace3\AceLocale-3.0\AceLocale-3.0.xml
+libs\Ace3\AceConsole-3.0\AceConsole-3.0.xml
+libs\Ace3\AceGUI-3.0\AceGUI-3.0.xml
+libs\Ace3\AceConfig-3.0\AceConfig-3.0.xml
+libs\Ace3\AceComm-3.0\AceComm-3.0.xml
+libs\Ace3\AceTab-3.0\AceTab-3.0.xml
+libs\Ace3\AceSerializer-3.0\AceSerializer-3.0.xml
+
+# Addon only
+defaults.lua
+main.lua
+options.lua
+themes.lua
