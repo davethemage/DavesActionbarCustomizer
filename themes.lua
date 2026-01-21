@@ -37,7 +37,7 @@ local function UpdateActionButtonState(button)
 
     -- For charge‑based actions
     local charges, maxCharges = GetActionCharges(action)
-    if charges and maxCharges and maxCharges > 0 then
+    if charges then
         if charges < 1 then
             icon:SetDesaturated(true)
         else
