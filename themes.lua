@@ -18,41 +18,44 @@ local function UpdateActionButtonState(button)
     local icon = button._icon
     if not icon then return end
 
-    local action = button.action or button:GetID()
-    if not action or not HasAction(action) then
-        icon:SetDesaturated(false)
-        return
-    end
-
-    -- For item actions
-    if IsItemAction(action) then
-        local count = GetActionCount(action) or 0
-        if count > 0 then
+    --Bliz blocks modification of bars when in combat
+    if not InCombatLockdown() then
+        local action = button.action or button:GetID()
+        if not action or not HasAction(action) then
             icon:SetDesaturated(false)
-        else
-            icon:SetDesaturated(true)
+            return
         end
-        return
-    end
 
-    -- For charge‑based actions
-    local charges, maxCharges = GetActionCharges(action)
-    if charges then
-        if charges < 1 then
+        -- For item actions
+        if IsItemAction(action) then
+            local count = GetActionCount(action) or 0
+            if count > 0 then
+                icon:SetDesaturated(false)
+            else
+                icon:SetDesaturated(true)
+            end
+            return
+        end
+
+        -- For charge‑based actions
+        local charges, maxCharges = GetActionCharges(action)
+        if charges and maxCharges and maxCharges > 0 then
+            if charges < 1 then
+                icon:SetDesaturated(true)
+            else
+                icon:SetDesaturated(false)
+            end
+            return
+        end
+
+        -- For normal cooldowns
+        local start, duration = GetActionCooldown(action)
+        local now = GetTime()
+        if start and duration and start > 0 and duration > 1.5 and (start + duration) > now then
             icon:SetDesaturated(true)
         else
             icon:SetDesaturated(false)
         end
-        return
-    end
-
-    -- For normal cooldowns
-    local start, duration = GetActionCooldown(action)
-    local now = GetTime()
-    if start and duration and start > 0 and duration > 1.5 and (start + duration) > now then
-        icon:SetDesaturated(true)
-    else
-        icon:SetDesaturated(false)
     end
 end
 
