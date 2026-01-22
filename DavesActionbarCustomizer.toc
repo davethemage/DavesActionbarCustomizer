@@ -3,7 +3,7 @@
 ## Notes: Customize font and size of keybind and stack text on default action bars
 ## Author: davethemage
 ## Version: 1.0.0
-## IconTexture: Interface\AddOns\Daves Action Bar Customizer\images\icon
+## IconTexture: Interface\AddOns\DavesActionBarCustomizer\images\icon.tga
 ## Category: Customization
 
 ## SavedVariables: DABC_DB

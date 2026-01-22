@@ -19,7 +19,7 @@ local function UpdateActionButtonState(button)
     if not icon then return end
 
     --Bliz blocks modification of bars when in combat
-    if not InCombatLockdown() then
+    if not InCombatLockdown() and not UnitIsDeadOrGhost("player")then
         local action = button.action or button:GetID()
         if not action or not HasAction(action) then
             icon:SetDesaturated(false)
