@@ -2,7 +2,7 @@
 ## Title: Daves Action Bar Customizer
 ## Notes: Customize font and size of keybind and stack text on default action bars
 ## Author: davethemage
-## Version: 1.0.2
+## Version: 1.0.3
 ## IconTexture: Interface\AddOns\DavesActionBarCustomizer\images\icon.tga
 ## Category: Customization
 
