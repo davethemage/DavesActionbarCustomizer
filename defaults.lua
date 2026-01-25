@@ -5,7 +5,7 @@ addon.longName = "Dave's Action Bar Customizer"
 addon.isBarInversed = false
 addon.themes = {"Default", "None", "Modern"}
 addon.ColorThemes = {"Custom", "Black/Dark", "Blue", "Green", "Pink", "Red", "White"}
-addon.ColorThemesRGB = { 
+addon.ColorThemesRGB = {
     [1] = {r=0,g=0,b=0,a=1}, -- Custom
     [2] = {r=0,g=0,b=0,a=1}, -- Black/Dark
     [3] = {r=0,g=0,b=1,a=1}, -- Blue
@@ -14,7 +14,7 @@ addon.ColorThemesRGB = {
     [6] = {r=1,g=0,b=0,a=1}, -- Red
     [7] = {r=1,g=1,b=1,a=1}, -- White
 }
-addon.version = "1.0.0"
+addon.version = "1.0.2"
 addon.defaults = {
   profile = {
     keybindFont = "Friz Quadrata TT",
