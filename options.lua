@@ -183,10 +183,10 @@ function DABC:SetupOptions()
                 order = 1,
                 values = DABC.themes,
                 get = function() return DABC.db.profile.theme end,
-                set = function(info, value) 
-                  DABC.db.profile.theme = value; 
+                set = function(info, value)
+                  DABC.db.profile.theme = value;
                   -- if value > 2 then
-                  --   DABC.db.profile.colorTheme = 1; 
+                  --   DABC.db.profile.colorTheme = 1;
                   -- end
                   StaticPopup_Show("DABC_RELOADUI")
                 end
@@ -202,11 +202,11 @@ function DABC:SetupOptions()
                 order = 11,
                 values = DABC.ColorThemes,
                 get = function() return DABC.db.profile.colorTheme end,
-                set = function(info, value) 
-                  if DABC.db.profile.theme == 1 or DABC.db.profile.theme == 2 then --default 
+                set = function(info, value)
+                  if DABC.db.profile.theme == 1 or DABC.db.profile.theme == 2 then --default
                     DABC.db.profile.theme = 3
                   end
-                  DABC.db.profile.colorTheme = value; 
+                  DABC.db.profile.colorTheme = value;
                   DABC.db.profile.buttonColor = DABC.ColorThemesRGB[value]
                   DABC.db.profile.borderColor = DABC.ColorThemesRGB[value]
                   StaticPopup_Show("DABC_RELOADUI")
@@ -229,11 +229,11 @@ function DABC:SetupOptions()
                 end,
                 set = function(info, r, g, b, a)
                   DABC.db.profile.buttonColor = { r = r, g = g, b = b, a = a }
-                  if DABC.db.profile.theme == 1 or DABC.db.profile.theme == 2 then --default 
+                  if DABC.db.profile.theme == 1 or DABC.db.profile.theme == 2 then --default
                     DABC.db.profile.theme = 3
                   end
                   StaticPopup_Show("DABC_RELOADUI")
-                end, 
+                end,
               },
               colorizeBorder = {
                 type = "color",
@@ -247,11 +247,11 @@ function DABC:SetupOptions()
                 end,
                 set = function(info, r, g, b, a)
                   DABC.db.profile.borderColor = { r = r, g = g, b = b, a = a }
-                  if DABC.db.profile.theme == 1 or DABC.db.profile.theme == 2 then --default 
+                  if DABC.db.profile.theme == 1 or DABC.db.profile.theme == 2 then --default
                     DABC.db.profile.theme = 3
                   end
                   StaticPopup_Show("DABC_RELOADUI")
-                end, 
+                end,
               },
               spacer20 = {
                 type = "description",
@@ -265,13 +265,39 @@ function DABC:SetupOptions()
                 get = function() return DABC.db.profile.inverseBar end,
                 set = function(info, value)
                   DABC.db.profile.inverseBar = value
-                  DABC:inverseBars(value)
+                  DABC:UpdateActionBars()
                 end,
               },
-              spacer30 = { 
+              spacer25 = {
                 type = "description",
                 name = " ",
-                order = 30, 
+                order = 25,
+              },
+              overridePadding = {
+                type = "toggle",
+                name = "Override Blizzard Padding",
+                order = 26,
+                get = function() return DABC.db.profile.overridePadding end,
+                set = function(info, value)
+                  DABC.db.profile.overridePadding = value
+                  DABC:UpdateActionBars()
+                end,
+              },
+              buttonPadding = {
+                type = "range",
+                name = "Button Padding",
+                order = 27,
+                min = -50, max = 50, step = 1,
+                get = function() return DABC.db.profile.padding or 0 end,
+                set = function(info, value)
+                  DABC.db.profile.padding = value
+                  DABC:UpdateActionBars()
+                end,
+              },
+              spacer30 = {
+                type = "description",
+                name = " ",
+                order = 30,
               },
             }
           } --end dispOpt
@@ -322,7 +348,7 @@ function DABC:SetupOptions()
       end,
     }
   end
-  
+
 -- Register your main options
   local parent_name = "Blizzard Customizer"
   if not _G.DavesCustomizerParentRegistered then
@@ -339,7 +365,7 @@ function DABC:SetupOptions()
     AceConfigDialog:AddToBlizOptions(parent_name, parent_name)
     _G.DavesCustomizerParentRegistered = true
    end
-   
+
   AceConfig:RegisterOptionsTable(DABC.shortName, options)
   AceConfigDialog:AddToBlizOptions(DABC.shortName, "Action Bar", parent_name)
 end

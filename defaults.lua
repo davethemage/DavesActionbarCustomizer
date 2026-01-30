@@ -14,7 +14,7 @@ addon.ColorThemesRGB = {
     [6] = {r=1,g=0,b=0,a=1}, -- Red
     [7] = {r=1,g=1,b=1,a=1}, -- White
 }
-addon.version = "1.0.2"
+addon.version = "1.0.3"
 addon.defaults = {
   profile = {
     keybindFont = "Friz Quadrata TT",
@@ -39,6 +39,7 @@ addon.defaults = {
     borderColor = {r=0,g=0,b=0,a=1},
     theme = 1,
     inverseBar = false,
-    padding = 2
+    padding = 2,
+    overridePadding = false,
   }
 }

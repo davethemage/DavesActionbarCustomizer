@@ -6,7 +6,6 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local LSM = LibStub("LibSharedMedia-3.0")
 
 local DABC = AceAddon:NewAddon(addon, addonName, "AceConsole-3.0")
-
 DABC.barButtons = {
     ActionBar1 = {"ActionButton", 12},
     ActionBar2 = {"MultiBarBottomLeftButton", 12},
@@ -16,6 +15,18 @@ DABC.barButtons = {
     ActionBar6 = {"MultiBar5Button", 12},
     ActionBar7 = {"MultiBar6Button", 12},
     ActionBar8 = {"MultiBar7Button", 12},
+}
+
+-- Map ActionBar names to their bar objects
+DABC.barNames = {
+    ActionBar1 = "MainActionBar",
+    ActionBar2 = "MultiBarBottomLeft",
+    ActionBar3 = "MultiBarBottomRight",
+    ActionBar4 = "MultiBarRight",
+    ActionBar5 = "MultiBarLeft",
+    ActionBar6 = "MultiBar5",
+    ActionBar7 = "MultiBar6",
+    ActionBar8 = "MultiBar7",
 }
 
 -- Keybind cleanup function
@@ -50,7 +61,6 @@ function DABC:RefreshConfig()
     end
 
     self:UpdateActionBars()
-    self:inverseBars()
 
     -- user feedback
     --DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00["..addon.shortName.."]|r Profile loaded: " .. self.db:GetCurrentProfile())
@@ -68,10 +78,10 @@ function DABC:OnInitialize()
 
     -- Initialize options GUI
     self:SetupOptions()
-    
+
     -- Register slash command
     self:RegisterChatCommand(addon.shortName:lower(), "OpenOptions")
-    
+
     -- Update action bars on load
     self:UpdateActionBars()
     -- print out status
@@ -91,34 +101,75 @@ function DABC:UpdateActionBars()
     end
 end
 
-function DABC:inverseBars()
-    if DABC.db.profile.inverseBar ~= addon.isBarInversed then
-        local bar_names = {
-            [1] = 'MainActionBar',
-            [2] = 'MultiBarBottomLeft',
-            [3] = 'MultiBarBottomRight',
-            [4] = 'MultiBarRight',
-            [5] = 'MultiBarLeft',
-            [6] = 'MultiBar5',
-            [7] = 'MultiBar6',
-            [8] = 'MultiBar7',
-        }
-        for _, bar in pairs(bar_names) do
-            _G[bar].addButtonsToTop = not _G[bar].addButtonsToTop
-            _G[bar]:UpdateGridLayout()
-        end
-        addon.isBarInversed = not addon.isBarInversed
-    end
-end
-
 -- Update individual bar
 function DABC:UpdateBar(barName)
     local data = self.barButtons[barName]
     if not data then return end
     local prefix, count = data[1], data[2]
+
+    -- Get padding settings
+    local overridePadding = self.db.profile.overridePadding
+    local paddingValue = overridePadding and (self.db.profile.padding or 0) or 0
+
+    -- Get the bar object to access row/button information
+    local barObjName = self.barNames[barName]
+    local bar = barObjName and _G[barObjName]
+
+    local buttonsPerRow = 12
+    if bar and bar.numRows and bar.numButtons then
+        buttonsPerRow = math.ceil(bar.numButtons / bar.numRows)
+    end
+
+    -- When padding is disabled, reset the bar layout to Blizzard defaults
+    if not overridePadding and bar then
+        paddingValue = bar.buttonPadding or 2
+    end
+
+    -- Always loop from 1 to count
     for i = 1, count do
         local button = _G[prefix..i]
         if button then
+            -- Clear existing anchor points to avoid circular dependencies
+            button:ClearAllPoints()
+
+            -- Calculate which row and position this button is in
+            local buttonPosition = i - 1  -- 0-indexed position
+            local row = math.floor(buttonPosition / buttonsPerRow)
+            local col = buttonPosition % buttonsPerRow
+            local isFirstInRow = (col == 0)
+
+            -- Apply padding calculations
+            if i == 1 then
+                -- Button 1: anchor based on inverseBar setting
+                if DABC.db.profile.inverseBar then
+                    -- Anchor to top-left
+                    button:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
+                else
+                    -- Anchor to bottom-left
+                    button:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", 0, 0)
+                end
+            elseif not isFirstInRow then
+                -- Not first in row: anchor to previous button (grow right)
+                local prevButton = _G[prefix..(i-1)]
+                if DABC.db.profile.inverseBar then
+                    button:SetPoint("TOPLEFT", prevButton, "TOPRIGHT", paddingValue, 0)
+                else
+                    button:SetPoint("BOTTOMLEFT", prevButton, "BOTTOMRIGHT", paddingValue, 0)
+                end
+            else
+                -- First button of a new row: anchor to the button in the previous row
+                local buttonInPrevRow = _G[prefix..(i - buttonsPerRow)]
+                if buttonInPrevRow then
+                    if DABC.db.profile.inverseBar then
+                        -- Grow down
+                        button:SetPoint("TOPLEFT", buttonInPrevRow, "BOTTOMLEFT", 0, -paddingValue)
+                    else
+                        -- Grow up
+                        button:SetPoint("BOTTOMLEFT", buttonInPrevRow, "TOPLEFT", 0, paddingValue)
+                    end
+                end
+            end
+
             if button.HotKey then
                 button.HotKey:SetFont(LSM:Fetch("font", self.db.profile.keybindFont), self.db.profile.keybindSize, "OUTLINE")
                 button.HotKey:SetText(CleanKeybindText(button.HotKey:GetText()))
@@ -141,12 +192,34 @@ function DABC:UpdateBar(barName)
             end
             local cd = button.cooldown
             if cd and cd.GetRegions then
-            for _, region in ipairs({ cd:GetRegions() }) do
-                if region and region:GetObjectType() == "FontString" then
-                    region:SetFont(LSM:Fetch("font", DABC.db.profile.cdFont), DABC.db.profile.cdSize, "OUTLINE")
+                for _, region in ipairs({ cd:GetRegions() }) do
+                    if region and region:GetObjectType() == "FontString" then
+                        region:SetFont(LSM:Fetch("font", DABC.db.profile.cdFont), DABC.db.profile.cdSize, "OUTLINE")
                     end
                 end
-            end   
+            end
+        end
+    end
+
+    -- Update bar size based on button layout
+    if bar and overridePadding then
+        local firstButton = _G[prefix.."1"]
+        if firstButton then
+            local scale = firstButton:GetParent():GetScale() or 1
+            local buttonWidth = firstButton:GetWidth() * scale
+            local buttonHeight = firstButton:GetHeight() * scale
+
+            -- Calculate number of rows
+            local numRows = math.ceil(count / buttonsPerRow)
+
+            -- Calculate total width: (buttons * width) + (padding between buttons)
+            local totalWidth = (buttonsPerRow * buttonWidth) + ((buttonsPerRow - 1) * paddingValue)
+
+            -- Calculate total height: (rows * height) + (padding between rows)
+            local totalHeight = (numRows * buttonHeight) + ((numRows - 1) * paddingValue)
+
+            bar:SetWidth(totalWidth)
+            bar:SetHeight(totalHeight)
         end
     end
 end
